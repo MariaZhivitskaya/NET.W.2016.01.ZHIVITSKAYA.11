@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Task3.Logic
 {
-    public class Set <T> : IEnumerable<T>/*, IEquatable<T> */where T : class
+    public class Set <T> : IEnumerable<T> where T : class, IComparable
     {
         private int _capacity;
         private T[] _elements = {};
@@ -131,14 +131,6 @@ namespace Task3.Logic
         /// </summary>
         /// <returns>Returns the next element.</returns>
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        /*public bool Equals(T other)
-        {
-            if (other == null)
-                return false;
-
-            return (this == other);
-        }*/
 
         /// <summary>
         /// Finds the index of a specified element.
