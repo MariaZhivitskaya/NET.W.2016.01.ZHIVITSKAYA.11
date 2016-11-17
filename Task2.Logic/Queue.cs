@@ -1,12 +1,20 @@
-﻿
-using System;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Task2.Logic
 {
-    public class Queue <T>
+    public class Queue<T> : IEnumerable<T>
     {
         private int _capacity;
+        private T[] _elements = { };
 
+        /// <summary>
+        /// A property for a capacity.
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown if the capacity is less or equal than 0.
+        /// </exception>
+        /// </summary>
         public int Capacity
         {
             get { return _capacity; }
@@ -19,15 +27,48 @@ namespace Task2.Logic
             }
         }
 
+        /// <summary>
+        /// A property for a size.
+        /// </summary>
         public int Size { get; private set; }
 
-        public T[] Elements { get; }
+        /// <summary>
+        /// A property for elements.
+        /// <exception cref="ArgumentException">
+        /// Thrown if the number of elements is less than 1.
+        /// </exception>
+        /// </summary>
+        public T[] Elements
+        {
+            get { return _elements; }
+            private set
+            {
+                if (value.Length < 1)
+                    throw new ArgumentException("Wrong number of parameters!");
+
+                _elements = new T[Capacity];
+                value.CopyTo(_elements, 0);
+            }
+        }
 
         public Queue(int capacity)
         {
             Capacity = capacity;
             Size = 0;
             Elements = new T[Capacity];
+        }
+
+        public Queue(int capacity, params T[] elements)
+        {
+            Capacity = capacity;
+            Elements = elements;
+            Size = elements.Length;
+        }
+
+        public T this[int index]
+        {
+            get { return _elements[index]; }
+            set { _elements[index] = value; }
         }
 
         /// <summary>
@@ -54,14 +95,14 @@ namespace Task2.Logic
             if (IsFull())
                 throw new ArgumentOutOfRangeException("Queue is full!");
 
-            Elements[++Size] = element;
+            Elements[Size++] = element;
         }
 
         /// <summary>
-        /// Gets the element form the queue.
+        /// Gets the element from the queue.
         /// </summary>
-        /// <exception cref="">
-        /// Thrown if the queue is empty;
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown if the queue is empty.
         /// </exception>
         /// <returns>Returns the first element.</returns>
         public T Pop()
@@ -77,16 +118,80 @@ namespace Task2.Logic
         }
 
         /// <summary>
+        /// Gets the enumerator for the queue.
+        /// </summary>
+        /// <returns>Returns the next element.</returns>
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => new Iterator(this);
+
+        /// <summary>
+        /// Gets the enumerator for the queue.
+        /// </summary>
+        /// <returns>Returns the next element.</returns>
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        /// <summary>
+        /// Gets the enumerator for the queue.
+        /// </summary>
+        /// <returns>Returns the next element.</returns>
+        public Iterator GetEnumerator() => new Iterator(this);
+
+        /// <summary>
+        /// An interator for a queue.
+        /// </summary>
+        public struct Iterator : IEnumerator<T>
+        {
+            private readonly Queue<T> _queue;
+            private int _currentIndex;
+
+            public Iterator(Queue<T> queue)
+            {
+                _currentIndex = -1;
+                _queue = queue;
+            }
+
+            /// <summary>
+            /// A property for a current element.
+            /// </summary>
+            public T Current
+            {
+                get
+                {
+                    if (_currentIndex == -1 || _currentIndex == _queue.Size)
+                        throw new InvalidOperationException();
+
+                    return _queue[_currentIndex];
+                }
+            }
+
+            /// <summary>
+            /// Resets the iterator.
+            /// </summary>
+            public void Reset() => _currentIndex = -1;
+
+            /// <summary>
+            /// Gets the current element.
+            /// </summary>
+            object IEnumerator.Current => Current;
+
+            /// <summary>
+            /// Indicates if there are more elements in the queue.
+            /// </summary>
+            /// <returns></returns>
+            public bool MoveNext() => ++_currentIndex < _queue.Size;
+
+            /// <summary>
+            /// Disposes hte garbage.
+            /// </summary>
+            public void Dispose() { }
+        }
+
+        /// <summary>
         /// Shifts the array of elements one position forward.
         /// </summary>
         private void ShiftForward()
         {
             for (int i = 0; i < Size - 1;)
-            {
-                var tmp = Elements[i];
                 Elements[i] = Elements[++i];
-                Elements[i] = tmp;
-            }
         }
     }
 }

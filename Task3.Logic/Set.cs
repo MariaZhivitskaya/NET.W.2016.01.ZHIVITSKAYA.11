@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Task3.Logic
 {
-    public class Set <T> : IEnumerable<T> where T : class, IComparable
+    public class Set<T> : IEnumerable<T> where T : class, IComparable
     {
         private int _capacity;
         private T[] _elements = {};
