@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Task3.Logic
 {
-    public class Set<T> : IEnumerable<T> where T : class, IComparable
+    public class Set<T> : IEnumerable<T>, ICloneable where T : class, IComparable
     {
         private T[] _elements = {};
         private const int ScalingCoefficient = 2;
@@ -86,6 +87,90 @@ namespace Task3.Logic
 
             Elements[Size - 1] = default(T);
             Size--;
+        }
+
+        /// <summary>
+        /// Unites two sets.
+        /// </summary>
+        /// <param name="set1">The first set.</param>
+        /// <param name="set2">The second set.</param>
+        /// <returns>Returns the union set.</returns>
+        public static Set<T> Union(Set<T> set1, Set<T> set2)
+        {
+            var unionSet = new Set<T>();
+            var elements = set1.Union(set2);
+            foreach (var element in elements)
+                unionSet.Insert(element);
+
+            return unionSet;
+        }
+
+        /// <summary>
+        /// Intersects two sets.
+        /// </summary>
+        /// <param name="set1">The first set.</param>
+        /// <param name="set2">The second set.</param>
+        /// <returns>Returns the intersection set.</returns>
+        public static Set<T> Intersect(Set<T> set1, Set<T> set2)
+        {
+            var intersectionSet = new Set<T>();
+            var elements = set1.Intersect(set2);
+            foreach (var element in elements)
+                intersectionSet.Insert(element);
+
+            return intersectionSet;
+        }
+
+        /// <summary>
+        /// Calculates the difference between
+        /// the first set and the second set.
+        /// </summary>
+        /// <param name="set1">The first set.</param>
+        /// <param name="set2">The second set.</param>
+        /// <returns>Returns the difference.</returns>
+        public static Set<T> Except(Set<T> set1, Set<T> set2)
+        {
+            var exceptedSet = new Set<T>();
+            var elements = set1.Except(set2);
+            foreach (var element in elements)
+                exceptedSet.Insert(element);
+
+            return exceptedSet;
+        }
+
+        /// <summary>
+        /// Calculates the symmetric difference between
+        /// the first set and the second set.
+        /// </summary>
+        /// <param name="set1">The first set.</param>
+        /// <param name="set2">The second set.</param>
+        /// <returns>Returns the symmetric difference.</returns>
+        public static Set<T> SymmetricExcept(Set<T> set1, Set<T> set2)
+        {
+            var union = Union(set1, set2);
+            var intersection = Intersect(set1, set2);
+            return Except(union, intersection);
+        }
+
+        /// <summary>
+        /// Clones the set.
+        /// </summary>
+        /// <returns>Returns the clone of the set.</returns>
+        object ICloneable.Clone() => Clone();
+
+        /// <summary>
+        /// Clones the set.
+        /// </summary>
+        /// <returns>Returns the clone of the set.</returns>
+        public Set<T> Clone()
+        {
+            var setCopy = new Set<T>
+            {
+                Size = Size,
+                Elements = new T[Capacity]
+            };
+            Array.Copy(Elements, setCopy.Elements, Size);
+            return setCopy;
         }
 
         /// <summary>
