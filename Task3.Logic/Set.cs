@@ -6,26 +6,14 @@ namespace Task3.Logic
 {
     public class Set<T> : IEnumerable<T> where T : class, IComparable
     {
-        private int _capacity;
         private T[] _elements = {};
+        private const int ScalingCoefficient = 2;
+        private const int StartCapacity = 5;
 
         /// <summary>
         /// A property for a capacity.
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// Thrown if the capacity is less or equal than 0.
-        /// </exception>
         /// </summary>
-        public int Capacity
-        {
-            get { return _capacity; }
-            set
-            {
-                if (value <= 0)
-                    throw new ArgumentOutOfRangeException("Wrong capacity!");
-
-                _capacity = value;
-            }
-        }
+        public int Capacity { get; private set; }
 
         /// <summary>
         /// A property for a size.
@@ -34,37 +22,24 @@ namespace Task3.Logic
 
         /// <summary>
         /// A property for elements.
-        /// <exception cref="ArgumentException">
-        /// Thrown if the number of elements is less than 1.
-        /// </exception>
         /// </summary>
         public T[] Elements
         {
             get { return _elements; }
             private set
             {
-                if (value.Length < 1)
-                    throw new ArgumentException("Wrong number of parameters!");
-
                 _elements = new T[Capacity];
                 value.CopyTo(_elements, 0);
             }
         }
 
-        public Set(int capacity)
+        public Set()
         {
-            Capacity = capacity;
+            Capacity = StartCapacity;
             Size = 0;
             Elements = new T[Capacity];
         }
-
-        public Set(int capacity, params T[] elements)
-        {
-            Capacity = capacity;
-            Elements = elements;
-            Size = elements.Length;
-        }
-
+       
         /// <summary>
         /// Indicates whether the set is full.
         /// </summary>
@@ -79,28 +54,24 @@ namespace Task3.Logic
 
         /// <summary>
         /// Inserts the element in the set.
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// Thrown if the set is full.
-        /// </exception>
         /// </summary>
         /// <param name="element">The element.</param>
         public void Insert(T element)
         {
-            if (IsFull())
-                throw new ArgumentOutOfRangeException("Set is full!");
+            if (!Contains(element))
+            {
+                if (IsFull())
+                    Resize();
 
-            for (int i = 0; i < Size; i++)
-                if (Elements[i].Equals(element))
-                    break;
-
-            Elements[Size++] = element;
+                Elements[Size++] = element;
+            }
         }
 
         /// <summary>
         /// Erases the element from the set.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// Thrown if the set is full.
+        /// Thrown if the set is empty.
         /// </exception>
         /// <param name="element">The element.</param>
         public void Erase(T element)
@@ -113,6 +84,7 @@ namespace Task3.Logic
             for (int i = index; i < Size - 1; i++)
                 Elements[i] = Elements[i + 1];
 
+            Elements[Size - 1] = default(T);
             Size--;
         }
 
@@ -131,6 +103,29 @@ namespace Task3.Logic
         /// </summary>
         /// <returns>Returns the next element.</returns>
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        /// <summary>
+        /// Resizes the set according to the scaling coefficient.
+        /// </summary>
+        private void Resize()
+        {
+            Capacity *= ScalingCoefficient;
+            Array.Resize(ref _elements, Capacity);
+        }
+
+        /// <summary>
+        /// Indicates whether the set contains 
+        /// the element.
+        /// </summary>
+        /// <param name="element">The element.</param>
+        /// <returns></returns>
+        private bool Contains(T element)
+        {
+            for (int i = 0; i < Size; i++)
+                if (Elements[i].Equals(element))
+                    return true;
+            return false;
+        }
 
         /// <summary>
         /// Finds the index of a specified element.
