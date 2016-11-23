@@ -8,7 +8,7 @@ namespace Task3.Logic
     /// <summary>
     /// Represents the Generic set for a reference type.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">The type.</typeparam>
     public class Set<T> : IEnumerable<T>, ICloneable where T : class, IComparable
     {
         private T[] _elements = {};

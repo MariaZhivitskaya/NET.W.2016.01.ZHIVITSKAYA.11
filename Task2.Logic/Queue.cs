@@ -4,10 +4,15 @@ using System.Collections.Generic;
 
 namespace Task2.Logic
 {
+    /// <summary>
+    /// Represents the Generic queue.
+    /// </summary>
+    /// <typeparam name="T">The type.</typeparam>
     public class Queue<T> : IEnumerable<T>
     {
-        private int _capacity;
-        private T[] _elements = { };
+        private T[] _elements = {};
+        private const int ScalingCoefficient = 2;
+        private const int StartCapacity = 5;
 
         /// <summary>
         /// A property for a capacity.
